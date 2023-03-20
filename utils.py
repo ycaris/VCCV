@@ -48,7 +48,7 @@ def parse_command():
                         help='momentum')
     parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float,
                         metavar='W', help='weight decay (default: 1e-4)')
-    parser.add_argument('--print-freq', '-p', default=10, type=int,
+    parser.add_argument('--print-freq', '-p', default=50, type=int,
                         metavar='N', help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
@@ -84,7 +84,7 @@ def adjust_learning_rate(optimizer, epoch, lr_init):
         param_group['lr'] = lr
 
 def get_output_directory(args):
-    output_directory = os.path.join('results',
+    output_directory = os.path.join('./results',
         '{}.sparsifier={}.samples={}.modality={}.arch={}.decoder={}.criterion={}.lr={}.bs={}.pretrained={}'.
         format(args.data, args.sparsifier, args.num_samples, args.modality, \
             args.arch, args.decoder, args.criterion, args.lr, args.batch_size, \
@@ -126,6 +126,7 @@ def merge_into_row_with_gt(input, depth_input, depth_target, depth_pred):
     depth_input_col = colored_depthmap(depth_input_cpu, d_min, d_max)
     depth_target_col = colored_depthmap(depth_target_cpu, d_min, d_max)
     depth_pred_col = colored_depthmap(depth_pred_cpu, d_min, d_max)
+
 
     img_merge = np.hstack([rgb, depth_input_col, depth_target_col, depth_pred_col])
 

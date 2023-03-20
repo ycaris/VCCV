@@ -4,10 +4,11 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 
-root_dir = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/data/nyudepthv2/train'
-subject = "living_room_0046a"
-dir = os.path.join(root_dir,subject)
-save_root_dir = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/visual/nyu'
+root_dir = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.5/rgb'
+subject = "rgb-png"
+# dir = os.path.join(root_dir,subject)
+dir = os.path.join(root_dir)
+save_root_dir = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.5'
 save_dir = os.path.join(save_root_dir,subject)
 
 if not os.path.exists(save_dir):
@@ -24,27 +25,30 @@ def colored_depthmap(depth, d_min=None, d_max=None):
     return 255 * cmap(depth_relative)[:,:,:3] # H, W, C
 
 for file in os.listdir(dir):
-    # h5 path and file name
+    # # h5 path and file name
     file_path = os.path.join(dir,file)
-    file_name = file.split('.h5')[0]
+    # file_name = file.split('.h5')[0]
 
-    # get rgb and depth from h5
-    h5f = h5py.File(file_path, "r")
-    rgb = np.array(h5f['rgb'])
-    rgb = np.transpose(rgb, (1, 2, 0))
-    depth = np.array(h5f['depth'])
+    # # get rgb and depth from h5
+    # h5f = h5py.File(file_path, "r")
+    # rgb = np.array(h5f['rgb'])
+    # rgb = np.transpose(rgb, (1, 2, 0))
+    # depth = np.array(h5f['depth'])
 
 
-    # normalize depth map to 0 and 255
-    depth = ((depth - depth.min()) * (1/(depth.max() - depth.min()) * 255)).astype('uint8')
+    # # normalize depth map to 0 and 255
+    # depth = ((depth - depth.min()) * (1/(depth.max() - depth.min()) * 255)).astype('uint8')
 
-    # create rgb for depth map
-    depth_color = colored_depthmap(depth)
+    # # create rgb for depth map
+    # depth_color = colored_depthmap(depth)
+
+    rgb = np.load(file_path)
+    file_name = file.split('.npy')[0]
 
     # # save image and rgb as jpeg
     img = Image.fromarray(rgb.astype('uint8'), 'RGB')
     img.save(os.path.join(save_dir,f'{file_name}-img.jpg'), "JPEG")
-    depth_color = Image.fromarray(depth_color.astype('uint8'),'RGB')
-    depth_color.save(os.path.join(save_dir,f'{file_name}-depth.jpg'), "JPEG")
+    # depth_color = Image.fromarray(depth_color.astype('uint8'),'RGB')
+    # depth_color.save(os.path.join(save_dir,f'{file_name}-depth.jpg'), "JPEG")
     
     print(f"finished {file}")
