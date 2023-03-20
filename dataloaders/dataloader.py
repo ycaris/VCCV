@@ -100,14 +100,16 @@ class MyDataloader(data.Dataset):
         """
         path, target = self.imgs[index]
         rgb, depth = self.loader(path)
-        return rgb, depth
+        return rgb, depth, path
 
     def __getitem__(self, index):
-        rgb, depth = self.__getraw__(index)
+        rgb, depth, path = self.__getraw__(index)
         if self.transform is not None:
             rgb_np, depth_np = self.transform(rgb, depth)
         else:
             raise(RuntimeError("transform not defined"))
+
+        
 
         # color normalization
         # rgb_tensor = normalize_rgb(rgb_tensor)
@@ -126,7 +128,7 @@ class MyDataloader(data.Dataset):
         depth_tensor = to_tensor(depth_np)
         depth_tensor = depth_tensor.unsqueeze(0)
 
-        return input_tensor, depth_tensor
+        return input_tensor, depth_tensor, path
 
     def __len__(self):
         return len(self.imgs)

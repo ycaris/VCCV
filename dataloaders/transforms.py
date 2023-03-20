@@ -17,6 +17,7 @@ import warnings
 
 import scipy.ndimage.interpolation as itpl
 import scipy.misc as misc
+from PIL import Image
 
 
 def _is_numpy_image(img):
@@ -333,12 +334,14 @@ class Resize(object):
         Returns:
             PIL Image: Rescaled image.
         """
-        if img.ndim == 3:
-            return misc.imresize(img, self.size, self.interpolation)
-        elif img.ndim == 2:
-            return misc.imresize(img, self.size, self.interpolation, 'F')
-        else:
-            RuntimeError('img should be ndarray with 2 or 3 dimensions. Got {}'.format(img.ndim))
+        img = Image.fromarray(img)
+        new_size = tuple((np.array(img.size) * self.size).astype(int))
+        # if img.ndim == 3:
+        return np.array(img.resize(new_size))
+        # elif img.ndim == 2:
+        #     return np.array(img.resize(new_size))
+        # else:
+        #     RuntimeError('img should be ndarray with 2 or 3 dimensions. Got {}'.format(img.ndim))
 
 
 class CenterCrop(object):
