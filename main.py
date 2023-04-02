@@ -16,7 +16,7 @@ cudnn.benchmark = True
 
 args = utils.parse_command()
 print(args)
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 fieldnames = ['mse', 'rmse', 'absrel', 'lg10', 'mae',
               'delta1', 'delta2', 'delta3',
@@ -88,7 +88,7 @@ def main():
         assert os.path.isfile(args.evaluate), \
             "=> no best model found at '{}'".format(args.evaluate)
         print("=> loading best model '{}'".format(args.evaluate))
-        checkpoint = torch.load(args.evaluate)
+        checkpoint = torch.load(args.evaluate, map_location=device)
         output_directory = os.path.dirname(args.evaluate)
         args = checkpoint['args']
         start_epoch = checkpoint['epoch'] + 1
@@ -106,7 +106,7 @@ def main():
         assert os.path.isfile(chkpt_path), \
             "=> no checkpoint found at '{}'".format(chkpt_path)
         print("=> loading checkpoint '{}'".format(chkpt_path))
-        checkpoint = torch.load(chkpt_path)
+        checkpoint = torch.load(chkpt_path, map_location=device)
         args = checkpoint['args']
         start_epoch = checkpoint['epoch'] + 1
         best_result = checkpoint['best_result']
@@ -254,7 +254,6 @@ def validate(val_loader, model, epoch, write_to_file=True):
         average_meter.update(result, gpu_time, data_time, input.size(0))
         end = time.time()
 
-        # # save predict depth map for rgbd, only for evaluation
         # input_np = input[:, :3, :, :]
         # depth = input[:, 3:, :, :]
         # # H, W, C
@@ -263,9 +262,9 @@ def validate(val_loader, model, epoch, write_to_file=True):
         # depth_pred_cpu = np.squeeze(pred.data.cpu().numpy())
         # name = path[0].split('/')[-1].split('.')[0] + '.npy'
 
-        # pred_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.5/pred'
-        # target_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.5/target'
-        # rgb_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.5/rgb'
+        # pred_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.19/pred'
+        # target_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.19/target'
+        # rgb_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.19/rgb'
         # pred_path = os.path.join(pred_root, name)
         # target_path = os.path.join(target_root, name)
         # rgb_path = os.path.join(rgb_root, name)
@@ -280,8 +279,27 @@ def validate(val_loader, model, epoch, write_to_file=True):
         # np.save(target_path, depth_target_cpu)
         # np.save(rgb_path, rgb)
 
+        # save predict depth map for rgbd, only for evaluation
+        # if args.modality == 'd' and i % 40 == 0 and i <= 320:
+        #     # H, W, C
+        #     depth_target_cpu = np.squeeze(target.cpu().numpy())
+        #     depth_pred_cpu = np.squeeze(pred.data.cpu().numpy())
+        #     name = path[0].split('/')[-1].split('.')[0] + '.npy'
+
+        #     pred_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.19/pred'
+        #     target_root = '/nfs/masi/zhouy26/ml-proj/sparse-to-dense.pytorch/predict_depth/3.19/target'
+        #     pred_path = os.path.join(pred_root, name)
+        #     target_path = os.path.join(target_root, name)
+        #     if i == 0:
+        #         if not os.path.exists(pred_root):
+        #             os.makedirs(pred_root)
+        #         if not os.path.exists(target_root):
+        #             os.makedirs(target_root)
+        #     np.save(pred_path, depth_pred_cpu)
+        #     np.save(target_path, depth_target_cpu)
+
         # save 8 images for visualization
-        skip = 50
+        skip = 40
         if args.modality == 'd':
             img_merge = None
         else:
@@ -305,8 +323,12 @@ def validate(val_loader, model, epoch, write_to_file=True):
                     row = utils.merge_into_row(rgb, target, pred)
                 img_merge = utils.add_row(img_merge, row)
             elif i == 8*skip:
-                filename = output_directory + \
-                    '/comparison_' + str(epoch) + '.png'
+                if args.evaluate:
+                    filename = output_directory + \
+                        '/eval_comparison_' + str(epoch) + '.png'
+                else:
+                    filename = output_directory + \
+                        '/comparison_' + str(epoch) + '.png'
                 utils.save_image(img_merge, filename)
 
         if (i+1) % args.print_freq == 0:
