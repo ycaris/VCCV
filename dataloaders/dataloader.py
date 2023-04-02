@@ -7,14 +7,18 @@ import dataloaders.transforms as transforms
 
 IMG_EXTENSIONS = ['.h5',]
 
+
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
+
 def find_classes(dir):
-    classes = [d for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))]
+    classes = [d for d in os.listdir(
+        dir) if os.path.isdir(os.path.join(dir, d))]
     classes.sort()
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
+
 
 def make_dataset(dir, class_to_idx):
     images = []
@@ -31,6 +35,7 @@ def make_dataset(dir, class_to_idx):
                     images.append(item)
     return images
 
+
 def h5_loader(path):
     h5f = h5py.File(path, "r")
     rgb = np.array(h5f['rgb'])
@@ -41,16 +46,18 @@ def h5_loader(path):
 # def rgb2grayscale(rgb):
 #     return rgb[:,:,0] * 0.2989 + rgb[:,:,1] * 0.587 + rgb[:,:,2] * 0.114
 
+
 to_tensor = transforms.ToTensor()
 
+
 class MyDataloader(data.Dataset):
-    modality_names = ['rgb', 'rgbd', 'd'] # , 'g', 'gd'
+    modality_names = ['rgb', 'rgbd', 'd']  # , 'g', 'gd'
     color_jitter = transforms.ColorJitter(0.4, 0.4, 0.4)
 
     def __init__(self, root, type, sparsifier=None, modality='rgb', loader=h5_loader):
         classes, class_to_idx = find_classes(root)
         imgs = make_dataset(root, class_to_idx)
-        assert len(imgs)>0, "Found 0 images in subfolders of: " + root + "\n"
+        assert len(imgs) > 0, "Found 0 images in subfolders of: " + root + "\n"
         print("Found {} images in {} folder.".format(len(imgs), type))
         self.root = root
         self.imgs = imgs
@@ -67,7 +74,7 @@ class MyDataloader(data.Dataset):
         self.sparsifier = sparsifier
 
         assert (modality in self.modality_names), "Invalid modality type: " + modality + "\n" + \
-                                "Supported dataset types are: " + ''.join(self.modality_names)
+            "Supported dataset types are: " + ''.join(self.modality_names)
         self.modality = modality
 
     def train_transform(self, rgb, depth):
@@ -107,9 +114,7 @@ class MyDataloader(data.Dataset):
         if self.transform is not None:
             rgb_np, depth_np = self.transform(rgb, depth)
         else:
-            raise(RuntimeError("transform not defined"))
-
-        
+            raise (RuntimeError("transform not defined"))
 
         # color normalization
         # rgb_tensor = normalize_rgb(rgb_tensor)
