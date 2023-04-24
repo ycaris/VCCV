@@ -16,7 +16,7 @@ This repo contains the VCCV implementation of the paper [Sparse and Noisy LiDAR 
 ## Introduction
 FusionNet combines global and local branches for sparse LiDAR map completion, using RGB guidance to improve depth map accuracy and confidence masks to account for uncertainty during the fusion process. While the global branch captures high-level features from the sparse LiDAR images, the local branch extracts fine-graind details and both branches work together to generate proper depths. The RGB image is fused with the outputs to correct mistakes in the spares input and confidence masks further ensure the reliability. 
 
-[example](../readme_img/Example.png)
+![example](../readme_img/Example.png)
 
 
 ## Requirements
