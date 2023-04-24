@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <title>Another Image</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .image-box {
+      border: 2px solid #dee2e6;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .image-box h2 {
+      margin-top: 0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 15px auto;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="image-box">
+    <h2>Completed Depth Map</h2>
+    <img src="{{ url_for('serve_results', filename=image_name) }}" alt="Another Image">
+    <br>
+    <a href="{{ url_for('upload_files') }}"><button>Return to Main Page</button></a>
+  </div>
+</body>
+</html>
