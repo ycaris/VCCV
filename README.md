@@ -12,7 +12,7 @@ This repo contains the the VCCV website app for Depth Completion. The model is a
     organization={IEEE}
 }
 ```
-![demo](https://drive.google.com/file/d/1Hpd9QV4CaXtqtys9yvqRFpOCjkOmI9EU/view?usp=share_link)
+[link](https://drive.google.com/file/d/1Hpd9QV4CaXtqtys9yvqRFpOCjkOmI9EU/view?usp=share_link)
 
 ## Requirements
 Python 3.7
